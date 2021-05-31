@@ -1,0 +1,62 @@
+version: "3.1"
+
+services:
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: 961126
+    volumes:
+      - ./database/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOSTS=mysql
+      - UPLOAD_LIMIT=2G
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 961126
+    ports:
+      - 27017:27017
+    volumes:
+      - ./database/mongo:/data/db
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
+  sonarqube:
+    image: sonarqube
+    environment: 
+      SONARQUBE_ADMIN_PASSWORD: 961126
+    ports:
+      - 9000:9000
+    volumes:
+      - ./sonarqube/data/:/opt/sonarqube/data
+      - ./sonarqube/logs/:/opt/sonarqube/logs
+      - ./sonarqube/extensions:/opt/sonarqube/extensions
+
+  es:
+    image: elasticsearch:7.12.1
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - ./database/es:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+  kib01:
+    image: kibana:7.12.1
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es:9200
